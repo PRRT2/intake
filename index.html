@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Intake — PRRT2 Foundation</title>
+  <meta name="description" content="Register with PRRT2 Foundation — join the first patient intake for people living with or carrying a PRRT2 gene mutation.">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@700&family=Fira+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Fira Sans',sans-serif; background:#ffffff; color:#1E1B17; min-height:100vh; display:flex; flex-direction:column; }
+    .top-bar { height:4px; background:#C97A3F; }
+    header { background:#143A55; padding:18px 40px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+    .wordmark { font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:24px; letter-spacing:0.04em; text-decoration:none; line-height:1; }
+    .wordmark .prrt { color:#F4ECD8; }
+    .wordmark .two  { color:#C97A3F; }
+    .wordmark-sub { display:block; font-family:'Fira Sans',sans-serif; font-weight:300; font-size:10px; color:rgba(244,236,216,0.5); letter-spacing:0.42em; text-transform:uppercase; margin-top:3px; }
+    .back-link { font-size:13px; color:rgba(244,236,216,0.6); text-decoration:none; }
+    .back-link:hover { color:#F4ECD8; }
+
+    /* Hero */
+    .hero { background:#143A55; padding:52px 40px 60px; border-bottom:4px solid #C97A3F; }
+    .hero-inner { max-width:680px; margin:0 auto; }
+    .hero h1 { font-weight:600; font-size:34px; color:#F4ECD8; line-height:1.2; margin-bottom:16px; letter-spacing:-0.01em; }
+    .hero p { font-weight:300; font-size:17px; color:rgba(244,236,216,0.78); line-height:1.65; margin-bottom:0; max-width:560px; }
+
+    /* Main */
+    .page-inner { flex:1; max-width:640px; width:100%; margin:0 auto; padding:0 40px 72px; }
+    section { padding:52px 0; border-bottom:1px solid rgba(20,58,85,0.1); }
+    section:last-of-type { border-bottom:none; }
+    .section-label { font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:11px; color:#C97A3F; letter-spacing:0.2em; text-transform:uppercase; margin-bottom:10px; }
+    section h2 { font-weight:600; font-size:22px; color:#143A55; margin-bottom:10px; }
+    section > p.lead { font-weight:300; font-size:15px; color:#555; line-height:1.6; margin-bottom:28px; max-width:560px; }
+
+    /* Form */
+    form { display:flex; flex-direction:column; gap:18px; }
+    .field { display:flex; flex-direction:column; gap:6px; }
+    .field label { font-weight:600; font-size:13px; color:#143A55; }
+    .field .optional { font-weight:300; color:#889B82; text-transform:none; letter-spacing:0; }
+    .field input, .field select, .field textarea {
+      font-family:'Fira Sans',sans-serif;
+      font-size:15px;
+      color:#1E1B17;
+      background:#f8f5f0;
+      border:1px solid rgba(20,58,85,0.18);
+      border-radius:5px;
+      padding:12px 14px;
+      outline:none;
+      transition:border-color 0.15s ease;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color:#C97A3F; }
+    .field textarea { resize:vertical; min-height:110px; font-weight:300; }
+    .row-two { display:flex; gap:16px; }
+    .row-two .field { flex:1; }
+
+    button[type="submit"] {
+      font-family:'IBM Plex Mono',monospace;
+      font-weight:700;
+      font-size:14px;
+      letter-spacing:0.04em;
+      text-transform:uppercase;
+      color:#F4ECD8;
+      background:#143A55;
+      border:none;
+      border-radius:5px;
+      padding:16px 28px;
+      cursor:pointer;
+      margin-top:8px;
+      transition:background 0.15s ease;
+    }
+    button[type="submit"]:hover { background:#0e2c42; }
+
+    /* Notices */
+    .notices { display:flex; flex-direction:column; gap:10px; margin-top:44px; }
+    .notice { padding:13px 16px; border-radius:5px; font-size:13px; line-height:1.55; }
+    .notice strong { font-weight:600; }
+    .notice-info { background:rgba(136,155,130,0.08); border-left:3px solid #889B82; }
+
+    footer { background:#143A55; padding:24px 40px; text-align:center; }
+    footer p { font-weight:300; font-size:13px; color:rgba(244,236,216,0.5); line-height:1.7; }
+    footer a { color:rgba(244,236,216,0.7); text-decoration:none; }
+    footer a:hover { color:#F4ECD8; }
+    .ein { font-family:'IBM Plex Mono',monospace; font-size:12px; color:rgba(244,236,216,0.3); margin-top:6px; }
+
+    @media (max-width:600px) {
+      header { padding:16px 20px; }
+      .hero { padding:38px 20px 44px; }
+      .hero h1 { font-size:26px; }
+      .page-inner { padding:0 20px 56px; }
+      .row-two { flex-direction:column; gap:18px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<header>
+  <a href="https://www.prrt2.org" class="wordmark">
+    <span class="prrt">PRRT</span><span class="two">2</span>
+    <span class="wordmark-sub">Foundation</span>
+  </a>
+  <a href="https://www.prrt2.org" class="back-link">← Back to prrt2.org</a>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <h1>Join the PRRT2 Patient Registry</h1>
+    <p>Tell us who you are so we can start connecting you with the resources, research, and community this diagnosis has never had. Takes less than two minutes.</p>
+  </div>
+</div>
+
+<div class="page-inner">
+
+  <section>
+    <div class="section-label">Patient Intake</div>
+    <h2>Register With Us</h2>
+    <p class="lead">Whether you have a confirmed PRRT2 diagnosis, carry the mutation without symptoms, or are a family member — we want to hear from you. This information stays private and internal to PRRT2 Foundation.</p>
+
+    <!-- Salesforce Web-to-Lead -->
+    <form action="https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8" method="POST">
+      <input type="hidden" name="oid" value="00Dfn00000I3WHA">
+      <input type="hidden" name="retURL" value="https://www.prrt2.org/foundation/thank-you">
+
+      <div class="row-two">
+        <div class="field">
+          <label for="first_name">First Name</label>
+          <input id="first_name" maxlength="40" name="first_name" type="text" required>
+        </div>
+        <div class="field">
+          <label for="last_name">Last Name</label>
+          <input id="last_name" maxlength="80" name="last_name" type="text" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" maxlength="80" name="email" type="email" required>
+      </div>
+
+      <div class="field">
+        <label for="phone">Phone <span class="optional">(optional)</span></label>
+        <input id="phone" maxlength="40" name="phone" type="tel">
+      </div>
+
+      <div class="field">
+        <label for="country">Country</label>
+        <input id="country" maxlength="80" name="country" type="text" required>
+      </div>
+
+      <div class="field">
+        <label for="description">Tell us about your PRRT2 situation <span class="optional">(optional)</span></label>
+        <textarea id="description" name="description" maxlength="32000" placeholder="Diagnosis status, symptoms, or anything you'd like us to know."></textarea>
+      </div>
+
+      <button type="submit">Submit Registration</button>
+    </form>
+  </section>
+
+  <div class="notices">
+    <div class="notice notice-info">
+      <strong>Your privacy matters.</strong> Information submitted here is used internally by PRRT2 Foundation to coordinate patient outreach and is never sold or shared. See our <a href="https://www.prrt2.org/resources/privacy-policy" style="color:#143A55;">Privacy Policy</a> for details.
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>PRRT2 Foundation, Inc. &nbsp;·&nbsp; North Port, Florida<br>
+  <a href="https://www.prrt2.org">prrt2.org</a> &nbsp;·&nbsp; <a href="mailto:contact@prrt2.org">contact@prrt2.org</a></p>
+  <p class="ein">EIN: 42-3128330</p>
+</footer>
+
+</body>
+</html>
