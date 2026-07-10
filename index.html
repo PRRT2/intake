@@ -1,3 +1,16 @@
+<!--
+  PRRT2 Foundation — Step 1 Patient Intake (rebuild with 10 quick-add questions)
+  ===============================================================================
+  DEPLOYED (7/10/2026): all placeholders below have been replaced with the real
+  Salesforce field IDs (created 7/10/2026). The Phenotypes checkbox reuses
+  the existing field 00Nfn00000JmgZt shared with Step 2 — 3 new checkbox
+  values (Cervical Dystonia, Generalized Dystonia, Tics) were added to it
+  in Salesforce; the old "Dystonia" value was left in place (not deleted)
+  to avoid orphaning historical Lead records.
+
+  No conditional JS in this form — every question is flat and always
+  visible, on purpose, to keep this a fast, low-friction form.
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,6 +47,8 @@
 
     /* Form */
     form { display:flex; flex-direction:column; gap:18px; }
+    fieldset { border:none; padding:0; margin:0; display:flex; flex-direction:column; gap:18px; }
+    legend { font-weight:600; font-size:16px; color:#143A55; margin-bottom:4px; padding:0; }
     .field { display:flex; flex-direction:column; gap:6px; }
     .field label { font-weight:600; font-size:13px; color:#143A55; }
     .field .optional { font-weight:300; color:#889B82; text-transform:none; letter-spacing:0; }
@@ -52,6 +67,12 @@
     .field textarea { resize:vertical; min-height:110px; font-weight:300; }
     .row-two { display:flex; gap:16px; }
     .row-two .field { flex:1; }
+    .checkbox-group { display:flex; flex-direction:column; gap:10px; }
+    .checkbox-group-label { font-weight:600; font-size:13px; color:#143A55; margin-bottom:2px; }
+    .checkbox-option { display:flex; align-items:center; gap:10px; }
+    .checkbox-option input[type="checkbox"] { width:17px; height:17px; accent-color:#C97A3F; flex-shrink:0; }
+    .checkbox-option label { font-weight:400; font-size:14px; color:#1E1B17; }
+    .section-divider { border:none; border-top:1px solid rgba(20,58,85,0.1); margin:6px 0; }
 
     button[type="submit"] {
       font-family:'IBM Plex Mono',monospace;
@@ -107,7 +128,7 @@
 <div class="hero">
   <div class="hero-inner">
     <h1>Join the PRRT2 Patient Registry</h1>
-    <p>Tell us who you are so we can start connecting you with the resources, research, and community this diagnosis has never had. Takes less than two minutes.</p>
+    <p>Tell us who you are so we can start connecting you with the resources, research, and community this diagnosis has never had. A few quick questions help us understand your situation right from the start — only your name and email are required.</p>
   </div>
 </div>
 
@@ -122,7 +143,6 @@
     <form action="https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8" method="POST">
       <input type="hidden" name="oid" value="00Dfn00000I3WHA">
       <input type="hidden" name="retURL" value="https://www.prrt2.org/about-the-foundation/thank-you">
-      <input type="hidden" name="company" value="Individual/Family Registrant">
 
       <div class="row-two">
         <div class="field">
@@ -149,6 +169,131 @@
         <label for="country">Country</label>
         <input id="country" maxlength="80" name="country" type="text" required>
       </div>
+
+      <hr class="section-divider">
+      <fieldset>
+        <legend>A Few Quick Questions <span class="optional" style="font-weight:300; font-size:13px;">(all optional)</span></legend>
+
+        <div class="checkbox-group">
+          <div class="checkbox-group-label">Phenotypes <span class="optional">(select all that apply)</span></div>
+          <div class="checkbox-option"><input id="phenotype_bfie" name="00Nfn00000JmgZt" type="checkbox" value="BFIE"><label for="phenotype_bfie">BFIE (Benign Familial Infantile Epilepsy)</label></div>
+          <div class="checkbox-option"><input id="phenotype_epilepsy" name="00Nfn00000JmgZt" type="checkbox" value="Epilepsy"><label for="phenotype_epilepsy">Epilepsy (non-infantile onset)</label></div>
+          <div class="checkbox-option"><input id="phenotype_pkd" name="00Nfn00000JmgZt" type="checkbox" value="PKD"><label for="phenotype_pkd">PKD (Paroxysmal Kinesigenic Dyskinesia)</label></div>
+          <div class="checkbox-option"><input id="phenotype_ped" name="00Nfn00000JmgZt" type="checkbox" value="PED"><label for="phenotype_ped">PED (Paroxysmal Exertional Dyskinesia)</label></div>
+          <div class="checkbox-option"><input id="phenotype_hm" name="00Nfn00000JmgZt" type="checkbox" value="HM"><label for="phenotype_hm">Hemiplegic Migraine</label></div>
+          <div class="checkbox-option"><input id="phenotype_dysphonia" name="00Nfn00000JmgZt" type="checkbox" value="Persistent Dysphonia"><label for="phenotype_dysphonia">Persistent Dysphonia</label></div>
+          <div class="checkbox-option"><input id="phenotype_cervical_dystonia" name="00Nfn00000JmgZt" type="checkbox" value="Cervical Dystonia"><label for="phenotype_cervical_dystonia">Cervical Dystonia</label></div>
+          <div class="checkbox-option"><input id="phenotype_generalized_dystonia" name="00Nfn00000JmgZt" type="checkbox" value="Generalized Dystonia"><label for="phenotype_generalized_dystonia">Generalized Dystonia</label></div>
+          <div class="checkbox-option"><input id="phenotype_tics" name="00Nfn00000JmgZt" type="checkbox" value="Tics"><label for="phenotype_tics">Tics</label></div>
+          <div class="checkbox-option"><input id="phenotype_other" name="00Nfn00000JmgZt" type="checkbox" value="Other"><label for="phenotype_other">Other</label></div>
+        </div>
+
+        <div class="field">
+          <label for="first_symptom">Which Symptom Appeared First?</label>
+          <select id="first_symptom" name="00Nfn00000JxaDt">
+            <option value="">--None--</option>
+            <option value="BFIE">BFIE</option>
+            <option value="Epilepsy">Epilepsy</option>
+            <option value="PKD">PKD</option>
+            <option value="PED">PED</option>
+            <option value="Hemiplegic Migraine">Hemiplegic Migraine</option>
+            <option value="Persistent Dysphonia">Persistent Dysphonia</option>
+            <option value="Cervical Dystonia">Cervical Dystonia</option>
+            <option value="Generalized Dystonia">Generalized Dystonia</option>
+            <option value="Tics">Tics</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="first_symptom_stage">Developmental Stage at First Symptom</label>
+          <select id="first_symptom_stage" name="00Nfn00000Jxa33">
+            <option value="">--None--</option>
+            <option value="Before age 1">Before age 1</option>
+            <option value="Age 1-5">Age 1-5</option>
+            <option value="Age 6-12">Age 6-12</option>
+            <option value="Puberty/teens">Puberty/teens</option>
+            <option value="Adulthood">Adulthood</option>
+            <option value="Unknown">Unknown</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="symptoms_first_year">Were Any Symptoms Present in the First Year of Life?</label>
+          <select id="symptoms_first_year" name="00Nfn00000JxbqD">
+            <option value="">--None--</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Unsure">Unsure</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="continuous_6mo">Have You Ever Had a Symptom Continuously for More Than 6 Months Without a Symptom-Free Period?</label>
+          <select id="continuous_6mo" name="00Nfn00000Jxbrp">
+            <option value="">--None--</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="told_would_resolve">Have You Ever Been Told Your Symptoms Would Resolve or You Would Outgrow Them?</label>
+          <select id="told_would_resolve" name="00Nfn00000JxbtR">
+            <option value="">--None--</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="years_to_diagnosis">How Many Years Between First Symptom and PRRT2 Diagnosis?</label>
+          <select id="years_to_diagnosis" name="00Nfn00000Jxbwf">
+            <option value="">--None--</option>
+            <option value="Less than 1">Less than 1</option>
+            <option value="1-5">1-5</option>
+            <option value="5-10">5-10</option>
+            <option value="10-20">10-20</option>
+            <option value="20+">20+</option>
+            <option value="Still unconfirmed">Still unconfirmed</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="testing_trigger">What Led to PRRT2 Testing?</label>
+          <select id="testing_trigger" name="00Nfn00000JxbyH">
+            <option value="">--None--</option>
+            <option value="Doctor suggested it">Doctor suggested it</option>
+            <option value="Family member diagnosed first">Family member diagnosed first</option>
+            <option value="Self-advocacy/research">Self-advocacy and research</option>
+            <option value="Part of broad genetic panel">Part of a broad genetic panel</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="testing_payment_source">Was Genetic Testing Covered by Insurance, a Sponsored/Free Testing Program, or Out-of-Pocket?</label>
+          <select id="testing_payment_source" name="00Nfn00000Jxbzt">
+            <option value="">--None--</option>
+            <option value="Insurance">Insurance</option>
+            <option value="Sponsored/free testing program">Sponsored/free testing program</option>
+            <option value="Out-of-pocket">Out-of-pocket</option>
+            <option value="Unknown">Unknown</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="research_contact_ok">Would You Be Willing to Be Contacted for Future Research Studies?</label>
+          <select id="research_contact_ok" name="00Nfn00000Jxc1V">
+            <option value="">--None--</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Maybe">Maybe</option>
+          </select>
+        </div>
+      </fieldset>
+
+      <hr class="section-divider">
 
       <div class="field">
         <label for="description">Tell us about your PRRT2 situation <span class="optional">(optional)</span></label>
