@@ -417,8 +417,19 @@ This registry is currently limited to people with a confirmed PRRT2 genetic test
 <fieldset>
 <legend>A Few Quick Questions <span class="optional" style="font-weight:300; font-size:13px;">(answer what you can)</span></legend>
 
+<div class="field">
+<label for="current_symptom_status">Right now, are you (or the person) experiencing PRRT2 symptoms?</label>
+<select id="current_symptom_status" name="00NbV000003nSFx">
+<option value="">--Select one--</option>
+<option value="Currently active">Yes — currently active</option>
+<option value="Only occasional">Only occasionally</option>
+<option value="In remission (had symptoms before)">No — in remission (had symptoms before)</option>
+<option value="Never had symptoms (asymptomatic carrier)">No — never had symptoms (asymptomatic carrier)</option>
+</select>
+</div>
+
 <div class="checkbox-group">
-<div class="checkbox-group-label">Phenotypes <span class="optional">(select all that apply)</span></div>
+<div class="checkbox-group-label">Phenotypes — ever experienced <span class="optional">(select all you've had, past or present)</span></div>
 <div class="checkbox-option"><input id="phenotype_bfie" name="00Nfn00000JmgZt" type="checkbox" value="BFIE"><label for="phenotype_bfie">BFIE (Benign Familial Infantile Epilepsy)</label></div>
 <div class="checkbox-option"><input id="phenotype_epilepsy" name="00Nfn00000JmgZt" type="checkbox" value="Epilepsy"><label for="phenotype_epilepsy">Epilepsy (non-infantile onset)</label></div>
 <div class="checkbox-option"><input id="phenotype_pkd" name="00Nfn00000JmgZt" type="checkbox" value="PKD"><label for="phenotype_pkd">PKD (Paroxysmal Kinesigenic Dyskinesia)</label></div>
@@ -429,6 +440,32 @@ This registry is currently limited to people with a confirmed PRRT2 genetic test
 <div class="checkbox-option"><input id="phenotype_generalized_dystonia" name="00Nfn00000JmgZt" type="checkbox" value="Generalized Dystonia"><label for="phenotype_generalized_dystonia">Generalized Dystonia</label></div>
 <div class="checkbox-option"><input id="phenotype_tics" name="00Nfn00000JmgZt" type="checkbox" value="Tics"><label for="phenotype_tics">Tics</label></div>
 <div class="checkbox-option"><input id="phenotype_other" name="00Nfn00000JmgZt" type="checkbox" value="Other"><label for="phenotype_other">Other</label></div>
+</div>
+
+<div class="checkbox-group">
+<div class="checkbox-group-label">Which of these are you still experiencing now? <span class="optional">(check any that are still active)</span></div>
+<div class="checkbox-option"><input id="cur_bfie" name="00NbV000003nSJB" type="checkbox" value="BFIE"><label for="cur_bfie">BFIE (Benign Familial Infantile Epilepsy)</label></div>
+<div class="checkbox-option"><input id="cur_epilepsy" name="00NbV000003nSJB" type="checkbox" value="Epilepsy"><label for="cur_epilepsy">Epilepsy (non-infantile onset)</label></div>
+<div class="checkbox-option"><input id="cur_pkd" name="00NbV000003nSJB" type="checkbox" value="PKD"><label for="cur_pkd">PKD (Paroxysmal Kinesigenic Dyskinesia)</label></div>
+<div class="checkbox-option"><input id="cur_ped" name="00NbV000003nSJB" type="checkbox" value="PED"><label for="cur_ped">PED (Paroxysmal Exertional Dyskinesia)</label></div>
+<div class="checkbox-option"><input id="cur_hm" name="00NbV000003nSJB" type="checkbox" value="HM"><label for="cur_hm">Hemiplegic Migraine</label></div>
+<div class="checkbox-option"><input id="cur_dysphonia" name="00NbV000003nSJB" type="checkbox" value="Persistent Dysphonia"><label for="cur_dysphonia">Persistent Dysphonia</label></div>
+<div class="checkbox-option"><input id="cur_cervical" name="00NbV000003nSJB" type="checkbox" value="Cervical Dystonia"><label for="cur_cervical">Cervical Dystonia</label></div>
+<div class="checkbox-option"><input id="cur_generalized" name="00NbV000003nSJB" type="checkbox" value="Generalized Dystonia"><label for="cur_generalized">Generalized Dystonia</label></div>
+<div class="checkbox-option"><input id="cur_tics" name="00NbV000003nSJB" type="checkbox" value="Tics"><label for="cur_tics">Tics</label></div>
+<div class="checkbox-option"><input id="cur_other" name="00NbV000003nSJB" type="checkbox" value="Other"><label for="cur_other">Other</label></div>
+</div>
+
+<div class="field">
+<label for="symptom_breadth_change">Have new or different symptoms appeared over time?</label>
+<select id="symptom_breadth_change" name="00Nfn00000JnxOz">
+<option value="">--None--</option>
+<option value="No change (same symptoms throughout)">No — same symptoms throughout</option>
+<option value="New symptoms have developed over time">Yes — new symptoms have developed over time</option>
+<option value="Some symptoms have resolved over time">Some symptoms have resolved over time</option>
+<option value="Both — new symptoms developed and others resolved">Both — new developed and others resolved</option>
+<option value="Not sure">Not sure</option>
+</select>
 </div>
 
 <div class="checkbox-group">
