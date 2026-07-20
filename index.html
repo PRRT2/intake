@@ -664,6 +664,9 @@ if (!checkbox.checked) {
 e.preventDefault();
 notice.style.display = 'block';
 checkbox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+} else if (typeof gtag === 'function') {
+// Google Ads conversion — fires on a valid intake registration submit
+gtag('event', 'conversion', { 'send_to': 'AW-18320156791/1fkbCNfZ3dMcEPfQ3Z9E' });
 }
 });
 
