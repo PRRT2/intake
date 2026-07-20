@@ -1,363 +1,600 @@
 <!--
-  PRRT2 Foundation — Step 1 Patient Intake (rebuild with 10 quick-add questions)
-  ===============================================================================
-  DEPLOYED (7/10/2026): all placeholders below have been replaced with the real
-  Salesforce field IDs (created 7/10/2026). The Phenotypes checkbox reuses
-  the existing field 00Nfn00000JmgZt shared with Step 2 — 3 new checkbox
-  values (Cervical Dystonia, Generalized Dystonia, Tics) were added to it
-  in Salesforce; the old "Dystonia" value was left in place (not deleted)
-  to avoid orphaning historical Lead records.
-
-  ELIGIBILITY GATE (added 7/10/2026): this registry is limited to people
-  with a confirmed positive PRRT2 genetic test result — including
-  asymptomatic carriers — or a family member/caregiver registering on
-  their behalf. A required checkbox reuses the existing Lead field
-  Confirmed_by_Testing__c (00Nfn00000JmP9F, Checkbox type, already
-  existed in the org, unused elsewhere). The checkbox's native `required`
-  attribute blocks submission client-side if unchecked; a small script
-  also shows a friendlier inline message instead of only the browser's
-  default validation bubble. This is a good-faith gate only — a static
-  Web-to-Lead form can't enforce this server-side.
-
-  No conditional JS in this form beyond the eligibility-gate script —
-  every question is flat and always visible, on purpose, to keep this a
-  fast, low-friction form.
+PRRT2 Foundation — Step 1 Patient Intake
+=========================================================================
+UPDATED (7/20/2026): Added 4 new fields + country dropdown + variant dropdown.
+  - Registering As           picklist  name=00NbV000003nR5N
+  - Year of Birth            number    name=00NbV000003nR0X
+  - Sex                      picklist  name=00NbV000003nR3l
+  - Email Updates Consent    checkbox  name=00NbV000003nR8b
+  - PRRT2 Variant (reused)   text      name=00Nfn00000JmPlx  (fed by dropdown)
+  - Country changed from free-text to a fixed dropdown (name=country) for clean stats.
+Eligibility gate (Confirmed_by_Testing__c, 00Nfn00000JmP9F) retained.
+Submission date is captured automatically by Salesforce (CreatedDate).
 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Patient Intake — PRRT2 Foundation</title>
-  <meta name="description" content="Register with PRRT2 Foundation — join the first patient intake for people living with or carrying a PRRT2 gene mutation.">
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@700&family=Fira+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Fira Sans',sans-serif; background:#ffffff; color:#1E1B17; min-height:100vh; display:flex; flex-direction:column; }
-    .top-bar { height:4px; background:#C97A3F; }
-    header { background:#143A55; padding:18px 40px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
-    .wordmark { font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:24px; letter-spacing:0.04em; text-decoration:none; line-height:1; }
-    .wordmark .prrt { color:#F4ECD8; }
-    .wordmark .two  { color:#C97A3F; }
-    .wordmark-sub { display:block; font-family:'Fira Sans',sans-serif; font-weight:300; font-size:10px; color:rgba(244,236,216,0.5); letter-spacing:0.42em; text-transform:uppercase; margin-top:3px; }
-    .back-link { font-size:13px; color:rgba(244,236,216,0.6); text-decoration:none; }
-    .back-link:hover { color:#F4ECD8; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patient Intake — PRRT2 Foundation</title>
+<meta name="description" content="Register with PRRT2 Foundation — join the first patient intake for people living with or carrying a PRRT2 gene mutation.">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@700&family=Fira+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Fira Sans',sans-serif; background:#ffffff; color:#1E1B17; min-height:100vh; display:flex; flex-direction:column; }
+.top-bar { height:4px; background:#C97A3F; }
+header { background:#143A55; padding:18px 40px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+.wordmark { font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:24px; letter-spacing:0.04em; text-decoration:none; line-height:1; }
+.wordmark .prrt { color:#F4ECD8; }
+.wordmark .two { color:#C97A3F; }
+.wordmark-sub { display:block; font-family:'Fira Sans',sans-serif; font-weight:300; font-size:10px; color:rgba(244,236,216,0.5); letter-spacing:0.42em; text-transform:uppercase; margin-top:3px; }
+.back-link { font-size:13px; color:rgba(244,236,216,0.6); text-decoration:none; }
+.back-link:hover { color:#F4ECD8; }
 
-    /* Hero */
-    .hero { background:#143A55; padding:52px 40px 60px; border-bottom:4px solid #C97A3F; }
-    .hero-inner { max-width:680px; margin:0 auto; }
-    .hero h1 { font-weight:600; font-size:34px; color:#F4ECD8; line-height:1.2; margin-bottom:16px; letter-spacing:-0.01em; }
-    .hero p { font-weight:300; font-size:17px; color:rgba(244,236,216,0.78); line-height:1.65; margin-bottom:0; max-width:560px; }
+/* Hero */
+.hero { background:#143A55; padding:52px 40px 60px; border-bottom:4px solid #C97A3F; }
+.hero-inner { max-width:680px; margin:0 auto; }
+.hero h1 { font-weight:600; font-size:34px; color:#F4ECD8; line-height:1.2; margin-bottom:16px; letter-spacing:-0.01em; }
+.hero p { font-weight:300; font-size:17px; color:rgba(244,236,216,0.78); line-height:1.65; margin-bottom:0; max-width:560px; }
 
-    /* Main */
-    .page-inner { flex:1; max-width:640px; width:100%; margin:0 auto; padding:0 40px 72px; }
-    section { padding:52px 0; border-bottom:1px solid rgba(20,58,85,0.1); }
-    section:last-of-type { border-bottom:none; }
-    .section-label { font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:11px; color:#C97A3F; letter-spacing:0.2em; text-transform:uppercase; margin-bottom:10px; }
-    section h2 { font-weight:600; font-size:22px; color:#143A55; margin-bottom:10px; }
-    section > p.lead { font-weight:300; font-size:15px; color:#555; line-height:1.6; margin-bottom:28px; max-width:560px; }
+/* Main */
+.page-inner { flex:1; max-width:640px; width:100%; margin:0 auto; padding:0 40px 72px; }
+section { padding:52px 0; border-bottom:1px solid rgba(20,58,85,0.1); }
+section:last-of-type { border-bottom:none; }
+.section-label { font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:11px; color:#C97A3F; letter-spacing:0.2em; text-transform:uppercase; margin-bottom:10px; }
+section h2 { font-weight:600; font-size:22px; color:#143A55; margin-bottom:10px; }
+section > p.lead { font-weight:300; font-size:15px; color:#555; line-height:1.6; margin-bottom:28px; max-width:560px; }
 
-    /* Form */
-    form { display:flex; flex-direction:column; gap:18px; }
-    fieldset { border:none; padding:0; margin:0; display:flex; flex-direction:column; gap:18px; }
-    legend { font-weight:600; font-size:16px; color:#143A55; margin-bottom:4px; padding:0; }
-    .field { display:flex; flex-direction:column; gap:6px; }
-    .field label { font-weight:600; font-size:13px; color:#143A55; }
-    .field .optional { font-weight:300; color:#889B82; text-transform:none; letter-spacing:0; }
-    .field input, .field select, .field textarea {
-      font-family:'Fira Sans',sans-serif;
-      font-size:15px;
-      color:#1E1B17;
-      background:#f8f5f0;
-      border:1px solid rgba(20,58,85,0.18);
-      border-radius:5px;
-      padding:12px 14px;
-      outline:none;
-      transition:border-color 0.15s ease;
-    }
-    .field input:focus, .field select:focus, .field textarea:focus { border-color:#C97A3F; }
-    .field textarea { resize:vertical; min-height:110px; font-weight:300; }
-    .row-two { display:flex; gap:16px; }
-    .row-two .field { flex:1; }
-    .checkbox-group { display:flex; flex-direction:column; gap:10px; }
-    .checkbox-group-label { font-weight:600; font-size:13px; color:#143A55; margin-bottom:2px; }
-    .checkbox-option { display:flex; align-items:center; gap:10px; }
-    .checkbox-option input[type="checkbox"] { width:17px; height:17px; accent-color:#C97A3F; flex-shrink:0; }
-    .checkbox-option label { font-weight:400; font-size:14px; color:#1E1B17; }
-    .section-divider { border:none; border-top:1px solid rgba(20,58,85,0.1); margin:6px 0; }
+/* Form */
+form { display:flex; flex-direction:column; gap:18px; }
+fieldset { border:none; padding:0; margin:0; display:flex; flex-direction:column; gap:18px; }
+legend { font-weight:600; font-size:16px; color:#143A55; margin-bottom:4px; padding:0; }
+.field { display:flex; flex-direction:column; gap:6px; }
+.field label { font-weight:600; font-size:13px; color:#143A55; }
+.field .optional { font-weight:300; color:#889B82; text-transform:none; letter-spacing:0; }
+.field input, .field select, .field textarea {
+font-family:'Fira Sans',sans-serif;
+font-size:15px;
+color:#1E1B17;
+background:#f8f5f0;
+border:1px solid rgba(20,58,85,0.18);
+border-radius:5px;
+padding:12px 14px;
+outline:none;
+transition:border-color 0.15s ease;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color:#C97A3F; }
+.field textarea { resize:vertical; min-height:110px; font-weight:300; }
+.row-two { display:flex; gap:16px; }
+.row-two .field { flex:1; }
+.checkbox-group { display:flex; flex-direction:column; gap:10px; }
+.checkbox-group-label { font-weight:600; font-size:13px; color:#143A55; margin-bottom:2px; }
+.checkbox-option { display:flex; align-items:center; gap:10px; }
+.checkbox-option input[type="checkbox"] { width:17px; height:17px; accent-color:#C97A3F; flex-shrink:0; }
+.checkbox-option label { font-weight:400; font-size:14px; color:#1E1B17; }
+.section-divider { border:none; border-top:1px solid rgba(20,58,85,0.1); margin:6px 0; }
+.consent-field { display:flex; flex-direction:row; align-items:flex-start; gap:10px; background:rgba(136,155,130,0.08); border-left:3px solid #889B82; padding:14px 16px; border-radius:5px; }
+.consent-field input[type="checkbox"] { width:18px; height:18px; margin-top:2px; accent-color:#C97A3F; flex-shrink:0; }
+.consent-field label { font-weight:400; font-size:14px; color:#1E1B17; line-height:1.5; }
 
-    button[type="submit"] {
-      font-family:'IBM Plex Mono',monospace;
-      font-weight:700;
-      font-size:14px;
-      letter-spacing:0.04em;
-      text-transform:uppercase;
-      color:#F4ECD8;
-      background:#143A55;
-      border:none;
-      border-radius:5px;
-      padding:16px 28px;
-      cursor:pointer;
-      margin-top:8px;
-      transition:background 0.15s ease;
-    }
-    button[type="submit"]:hover { background:#0e2c42; }
+button[type="submit"] {
+font-family:'IBM Plex Mono',monospace;
+font-weight:700;
+font-size:14px;
+letter-spacing:0.04em;
+text-transform:uppercase;
+color:#F4ECD8;
+background:#143A55;
+border:none;
+border-radius:5px;
+padding:16px 28px;
+cursor:pointer;
+margin-top:8px;
+transition:background 0.15s ease;
+}
+button[type="submit"]:hover { background:#0e2c42; }
 
-    /* Notices */
-    .notices { display:flex; flex-direction:column; gap:10px; margin-top:44px; }
-    .notice { padding:13px 16px; border-radius:5px; font-size:13px; line-height:1.55; }
-    .notice strong { font-weight:600; }
-    .notice-info { background:rgba(136,155,130,0.08); border-left:3px solid #889B82; }
+/* Notices */
+.notices { display:flex; flex-direction:column; gap:10px; margin-top:44px; }
+.notice { padding:13px 16px; border-radius:5px; font-size:13px; line-height:1.55; }
+.notice strong { font-weight:600; }
+.notice-info { background:rgba(136,155,130,0.08); border-left:3px solid #889B82; }
 
-    footer { background:#143A55; padding:24px 40px; text-align:center; }
-    footer p { font-weight:300; font-size:13px; color:rgba(244,236,216,0.5); line-height:1.7; }
-    footer a { color:rgba(244,236,216,0.7); text-decoration:none; }
-    footer a:hover { color:#F4ECD8; }
-    .ein { font-family:'IBM Plex Mono',monospace; font-size:12px; color:rgba(244,236,216,0.3); margin-top:6px; }
+footer { background:#143A55; padding:24px 40px; text-align:center; }
+footer p { font-weight:300; font-size:13px; color:rgba(244,236,216,0.5); line-height:1.7; }
+footer a { color:rgba(244,236,216,0.7); text-decoration:none; }
+footer a:hover { color:#F4ECD8; }
+.ein { font-family:'IBM Plex Mono',monospace; font-size:12px; color:rgba(244,236,216,0.3); margin-top:6px; }
 
-    @media (max-width:600px) {
-      header { padding:16px 20px; }
-      .hero { padding:38px 20px 44px; }
-      .hero h1 { font-size:26px; }
-      .page-inner { padding:0 20px 56px; }
-      .row-two { flex-direction:column; gap:18px; }
-    }
-  </style>
+@media (max-width:600px) {
+header { padding:16px 20px; }
+.hero { padding:38px 20px 44px; }
+.hero h1 { font-size:26px; }
+.page-inner { padding:0 20px 56px; }
+.row-two { flex-direction:column; gap:18px; }
+}
+</style>
 </head>
 <body>
 
 <div class="top-bar"></div>
 
 <header>
-  <a href="https://www.prrt2.org" class="wordmark">
-    <span class="prrt">PRRT</span><span class="two">2</span>
-    <span class="wordmark-sub">Foundation</span>
-  </a>
-  <a href="https://www.prrt2.org" class="back-link">← Back to prrt2.org</a>
+<a href="https://www.prrt2.org" class="wordmark">
+<span class="prrt">PRRT</span><span class="two">2</span>
+<span class="wordmark-sub">Foundation</span>
+</a>
+<a href="https://www.prrt2.org" class="back-link">← Back to prrt2.org</a>
 </header>
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-inner">
-    <h1>Join the PRRT2 Patient Registry</h1>
-    <p>This registry is for individuals with a confirmed genetic test result showing a PRRT2 mutation — including asymptomatic carriers — or a family member registering on their behalf. Tell us who you are so we can start connecting you with the resources, research, and community this diagnosis has never had.</p>
-  </div>
+<div class="hero-inner">
+<h1>Join the PRRT2 Patient Registry</h1>
+<p>This registry is for individuals with a confirmed genetic test result showing a PRRT2 mutation — including asymptomatic carriers — or a family member registering on their behalf. Tell us who you are so we can start connecting you with the resources, research, and community this diagnosis has never had.</p>
+</div>
 </div>
 
 <div class="page-inner">
 
-  <section>
-    <div class="section-label">Patient Intake</div>
-    <h2>Register With Us</h2>
-    <p class="lead">This registry is limited to people with a confirmed positive PRRT2 genetic test result — symptomatic or not — or a family member/caregiver registering on their behalf. This information stays private and internal to PRRT2 Foundation.</p>
+<section>
+<div class="section-label">Patient Intake</div>
+<h2>Register With Us</h2>
+<p class="lead">This registry is limited to people with a confirmed positive PRRT2 genetic test result — symptomatic or not — or a family member/caregiver registering on their behalf. This information stays private and internal to PRRT2 Foundation.</p>
 
-    <!-- Salesforce Web-to-Lead -->
-    <form action="https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8" method="POST" id="intake-form">
-      <input type="hidden" name="oid" value="00Dfn00000I3WHA">
-      <input type="hidden" name="retURL" value="https://www.prrt2.org/about-the-foundation/thank-you">
+<!-- Salesforce Web-to-Lead -->
+<form action="https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8" method="POST" id="intake-form">
+<input type="hidden" name="oid" value="00Dfn00000I3WHA">
+<input type="hidden" name="retURL" value="https://www.prrt2.org/about-the-foundation/thank-you">
 
-      <div class="field" style="flex-direction:row; align-items:flex-start; gap:10px;">
-        <input type="checkbox" id="confirmed_testing" name="Confirmed_by_Testing__c" value="1" required style="width:18px; height:18px; margin-top:2px; accent-color:#C97A3F; flex-shrink:0;">
-        <label for="confirmed_testing" style="font-weight:400; font-size:14px;">I confirm that I — or the person I'm registering — have a confirmed genetic test result showing a PRRT2 gene mutation. <span style="color:#C97A3F;">*</span></label>
-      </div>
-      <div id="not-eligible-notice" class="notice" style="display:none; background:rgba(201,122,63,0.1); border-left:3px solid #C97A3F;">
-        This registry is currently limited to people with a confirmed PRRT2 genetic test result (or a family member/caregiver registering on their behalf). If you don't yet have a confirmed diagnosis, please check back once you do, or reach out to <a href="mailto:contact@prrt2.org" style="color:#143A55;">contact@prrt2.org</a> with questions.
-      </div>
-      <hr class="section-divider">
+<div class="field" style="flex-direction:row; align-items:flex-start; gap:10px;">
+<input type="checkbox" id="confirmed_testing" name="Confirmed_by_Testing__c" value="1" required style="width:18px; height:18px; margin-top:2px; accent-color:#C97A3F; flex-shrink:0;">
+<label for="confirmed_testing" style="font-weight:400; font-size:14px;">I confirm that I — or the person I'm registering — have a confirmed genetic test result showing a PRRT2 gene mutation. <span style="color:#C97A3F;">*</span></label>
+</div>
+<div id="not-eligible-notice" class="notice" style="display:none; background:rgba(201,122,63,0.1); border-left:3px solid #C97A3F;">
+This registry is currently limited to people with a confirmed PRRT2 genetic test result (or a family member/caregiver registering on their behalf). If you don't yet have a confirmed diagnosis, please check back once you do, or reach out to <a href="mailto:contact@prrt2.org" style="color:#143A55;">contact@prrt2.org</a> with questions.
+</div>
+<hr class="section-divider">
 
-      <div class="row-two">
-        <div class="field">
-          <label for="first_name">First Name</label>
-          <input id="first_name" maxlength="40" name="first_name" type="text" required>
-        </div>
-        <div class="field">
-          <label for="last_name">Last Name</label>
-          <input id="last_name" maxlength="80" name="last_name" type="text" required>
-        </div>
-      </div>
+<div class="field">
+<label for="registering_as">I'm registering <span class="optional">(who this profile is for)</span></label>
+<select id="registering_as" name="00NbV000003nR5N">
+<option value="">--None--</option>
+<option value="Myself">Myself</option>
+<option value="Parent or guardian">As a parent or guardian</option>
+<option value="Other family member or caregiver">As another family member or caregiver</option>
+</select>
+</div>
 
-      <div class="field">
-        <label for="email">Email</label>
-        <input id="email" maxlength="80" name="email" type="email" required>
-      </div>
+<div class="row-two">
+<div class="field">
+<label for="first_name">First Name <span class="optional">(of the person with PRRT2)</span></label>
+<input id="first_name" maxlength="40" name="first_name" type="text" required>
+</div>
+<div class="field">
+<label for="last_name">Last Name</label>
+<input id="last_name" maxlength="80" name="last_name" type="text" required>
+</div>
+</div>
 
-      <div class="field">
-        <label for="phone">Phone <span class="optional">(optional)</span></label>
-        <input id="phone" maxlength="40" name="phone" type="tel">
-      </div>
+<div class="field">
+<label for="email">Email</label>
+<input id="email" maxlength="80" name="email" type="email" required>
+</div>
 
-      <div class="field">
-        <label for="country">Country</label>
-        <input id="country" maxlength="80" name="country" type="text" required>
-      </div>
+<div class="field">
+<label for="phone">Phone <span class="optional">(optional)</span></label>
+<input id="phone" maxlength="40" name="phone" type="tel">
+</div>
 
-      <hr class="section-divider">
-      <fieldset>
-        <legend>A Few Quick Questions <span class="optional" style="font-weight:300; font-size:13px;">(all optional)</span></legend>
+<div class="row-two">
+<div class="field">
+<label for="country">Country</label>
+<select id="country" name="country" required>
+<option value="">--Select a country--</option>
+<option value="United States">United States</option>
+<option value="United Kingdom">United Kingdom</option>
+<option value="Canada">Canada</option>
+<option value="Australia">Australia</option>
+<option disabled>──────────</option>
+<option value="Afghanistan">Afghanistan</option>
+<option value="Albania">Albania</option>
+<option value="Algeria">Algeria</option>
+<option value="Andorra">Andorra</option>
+<option value="Angola">Angola</option>
+<option value="Antigua and Barbuda">Antigua and Barbuda</option>
+<option value="Argentina">Argentina</option>
+<option value="Armenia">Armenia</option>
+<option value="Australia">Australia</option>
+<option value="Austria">Austria</option>
+<option value="Azerbaijan">Azerbaijan</option>
+<option value="Bahamas">Bahamas</option>
+<option value="Bahrain">Bahrain</option>
+<option value="Bangladesh">Bangladesh</option>
+<option value="Barbados">Barbados</option>
+<option value="Belarus">Belarus</option>
+<option value="Belgium">Belgium</option>
+<option value="Belize">Belize</option>
+<option value="Benin">Benin</option>
+<option value="Bhutan">Bhutan</option>
+<option value="Bolivia">Bolivia</option>
+<option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option>
+<option value="Botswana">Botswana</option>
+<option value="Brazil">Brazil</option>
+<option value="Brunei">Brunei</option>
+<option value="Bulgaria">Bulgaria</option>
+<option value="Burkina Faso">Burkina Faso</option>
+<option value="Burundi">Burundi</option>
+<option value="Cabo Verde">Cabo Verde</option>
+<option value="Cambodia">Cambodia</option>
+<option value="Cameroon">Cameroon</option>
+<option value="Canada">Canada</option>
+<option value="Central African Republic">Central African Republic</option>
+<option value="Chad">Chad</option>
+<option value="Chile">Chile</option>
+<option value="China">China</option>
+<option value="Colombia">Colombia</option>
+<option value="Comoros">Comoros</option>
+<option value="Congo (Republic of the)">Congo (Republic of the)</option>
+<option value="Congo (Democratic Republic of the)">Congo (Democratic Republic of the)</option>
+<option value="Costa Rica">Costa Rica</option>
+<option value="Côte d'Ivoire">Côte d'Ivoire</option>
+<option value="Croatia">Croatia</option>
+<option value="Cuba">Cuba</option>
+<option value="Cyprus">Cyprus</option>
+<option value="Czechia">Czechia</option>
+<option value="Denmark">Denmark</option>
+<option value="Djibouti">Djibouti</option>
+<option value="Dominica">Dominica</option>
+<option value="Dominican Republic">Dominican Republic</option>
+<option value="Ecuador">Ecuador</option>
+<option value="Egypt">Egypt</option>
+<option value="El Salvador">El Salvador</option>
+<option value="Equatorial Guinea">Equatorial Guinea</option>
+<option value="Eritrea">Eritrea</option>
+<option value="Estonia">Estonia</option>
+<option value="Eswatini">Eswatini</option>
+<option value="Ethiopia">Ethiopia</option>
+<option value="Fiji">Fiji</option>
+<option value="Finland">Finland</option>
+<option value="France">France</option>
+<option value="Gabon">Gabon</option>
+<option value="Gambia">Gambia</option>
+<option value="Georgia">Georgia</option>
+<option value="Germany">Germany</option>
+<option value="Ghana">Ghana</option>
+<option value="Greece">Greece</option>
+<option value="Grenada">Grenada</option>
+<option value="Guatemala">Guatemala</option>
+<option value="Guinea">Guinea</option>
+<option value="Guinea-Bissau">Guinea-Bissau</option>
+<option value="Guyana">Guyana</option>
+<option value="Haiti">Haiti</option>
+<option value="Honduras">Honduras</option>
+<option value="Hungary">Hungary</option>
+<option value="Iceland">Iceland</option>
+<option value="India">India</option>
+<option value="Indonesia">Indonesia</option>
+<option value="Iran">Iran</option>
+<option value="Iraq">Iraq</option>
+<option value="Ireland">Ireland</option>
+<option value="Israel">Israel</option>
+<option value="Italy">Italy</option>
+<option value="Jamaica">Jamaica</option>
+<option value="Japan">Japan</option>
+<option value="Jordan">Jordan</option>
+<option value="Kazakhstan">Kazakhstan</option>
+<option value="Kenya">Kenya</option>
+<option value="Kiribati">Kiribati</option>
+<option value="Kuwait">Kuwait</option>
+<option value="Kyrgyzstan">Kyrgyzstan</option>
+<option value="Laos">Laos</option>
+<option value="Latvia">Latvia</option>
+<option value="Lebanon">Lebanon</option>
+<option value="Lesotho">Lesotho</option>
+<option value="Liberia">Liberia</option>
+<option value="Libya">Libya</option>
+<option value="Liechtenstein">Liechtenstein</option>
+<option value="Lithuania">Lithuania</option>
+<option value="Luxembourg">Luxembourg</option>
+<option value="Madagascar">Madagascar</option>
+<option value="Malawi">Malawi</option>
+<option value="Malaysia">Malaysia</option>
+<option value="Maldives">Maldives</option>
+<option value="Mali">Mali</option>
+<option value="Malta">Malta</option>
+<option value="Marshall Islands">Marshall Islands</option>
+<option value="Mauritania">Mauritania</option>
+<option value="Mauritius">Mauritius</option>
+<option value="Mexico">Mexico</option>
+<option value="Micronesia">Micronesia</option>
+<option value="Moldova">Moldova</option>
+<option value="Monaco">Monaco</option>
+<option value="Mongolia">Mongolia</option>
+<option value="Montenegro">Montenegro</option>
+<option value="Morocco">Morocco</option>
+<option value="Mozambique">Mozambique</option>
+<option value="Myanmar">Myanmar</option>
+<option value="Namibia">Namibia</option>
+<option value="Nauru">Nauru</option>
+<option value="Nepal">Nepal</option>
+<option value="Netherlands">Netherlands</option>
+<option value="New Zealand">New Zealand</option>
+<option value="Nicaragua">Nicaragua</option>
+<option value="Niger">Niger</option>
+<option value="Nigeria">Nigeria</option>
+<option value="North Korea">North Korea</option>
+<option value="North Macedonia">North Macedonia</option>
+<option value="Norway">Norway</option>
+<option value="Oman">Oman</option>
+<option value="Pakistan">Pakistan</option>
+<option value="Palau">Palau</option>
+<option value="Palestine">Palestine</option>
+<option value="Panama">Panama</option>
+<option value="Papua New Guinea">Papua New Guinea</option>
+<option value="Paraguay">Paraguay</option>
+<option value="Peru">Peru</option>
+<option value="Philippines">Philippines</option>
+<option value="Poland">Poland</option>
+<option value="Portugal">Portugal</option>
+<option value="Qatar">Qatar</option>
+<option value="Romania">Romania</option>
+<option value="Russia">Russia</option>
+<option value="Rwanda">Rwanda</option>
+<option value="Saint Kitts and Nevis">Saint Kitts and Nevis</option>
+<option value="Saint Lucia">Saint Lucia</option>
+<option value="Saint Vincent and the Grenadines">Saint Vincent and the Grenadines</option>
+<option value="Samoa">Samoa</option>
+<option value="San Marino">San Marino</option>
+<option value="Sao Tome and Principe">Sao Tome and Principe</option>
+<option value="Saudi Arabia">Saudi Arabia</option>
+<option value="Senegal">Senegal</option>
+<option value="Serbia">Serbia</option>
+<option value="Seychelles">Seychelles</option>
+<option value="Sierra Leone">Sierra Leone</option>
+<option value="Singapore">Singapore</option>
+<option value="Slovakia">Slovakia</option>
+<option value="Slovenia">Slovenia</option>
+<option value="Solomon Islands">Solomon Islands</option>
+<option value="Somalia">Somalia</option>
+<option value="South Africa">South Africa</option>
+<option value="South Korea">South Korea</option>
+<option value="South Sudan">South Sudan</option>
+<option value="Spain">Spain</option>
+<option value="Sri Lanka">Sri Lanka</option>
+<option value="Sudan">Sudan</option>
+<option value="Suriname">Suriname</option>
+<option value="Sweden">Sweden</option>
+<option value="Switzerland">Switzerland</option>
+<option value="Syria">Syria</option>
+<option value="Taiwan">Taiwan</option>
+<option value="Tajikistan">Tajikistan</option>
+<option value="Tanzania">Tanzania</option>
+<option value="Thailand">Thailand</option>
+<option value="Timor-Leste">Timor-Leste</option>
+<option value="Togo">Togo</option>
+<option value="Tonga">Tonga</option>
+<option value="Trinidad and Tobago">Trinidad and Tobago</option>
+<option value="Tunisia">Tunisia</option>
+<option value="Turkey">Turkey</option>
+<option value="Turkmenistan">Turkmenistan</option>
+<option value="Tuvalu">Tuvalu</option>
+<option value="Uganda">Uganda</option>
+<option value="Ukraine">Ukraine</option>
+<option value="United Arab Emirates">United Arab Emirates</option>
+<option value="United Kingdom">United Kingdom</option>
+<option value="United States">United States</option>
+<option value="Uruguay">Uruguay</option>
+<option value="Uzbekistan">Uzbekistan</option>
+<option value="Vanuatu">Vanuatu</option>
+<option value="Vatican City">Vatican City</option>
+<option value="Venezuela">Venezuela</option>
+<option value="Vietnam">Vietnam</option>
+<option value="Yemen">Yemen</option>
+<option value="Zambia">Zambia</option>
+<option value="Zimbabwe">Zimbabwe</option>
+<option value="Other">Other / Not listed</option>
+</select>
+</div>
+<div class="field">
+<label for="year_of_birth">Year of Birth <span class="optional">(of the person with PRRT2, optional)</span></label>
+<input id="year_of_birth" name="00NbV000003nR0X" type="number" min="1900" max="2026" placeholder="e.g. 1998">
+</div>
+</div>
 
-        <div class="checkbox-group">
-          <div class="checkbox-group-label">Phenotypes <span class="optional">(select all that apply)</span></div>
-          <div class="checkbox-option"><input id="phenotype_bfie" name="00Nfn00000JmgZt" type="checkbox" value="BFIE"><label for="phenotype_bfie">BFIE (Benign Familial Infantile Epilepsy)</label></div>
-          <div class="checkbox-option"><input id="phenotype_epilepsy" name="00Nfn00000JmgZt" type="checkbox" value="Epilepsy"><label for="phenotype_epilepsy">Epilepsy (non-infantile onset)</label></div>
-          <div class="checkbox-option"><input id="phenotype_pkd" name="00Nfn00000JmgZt" type="checkbox" value="PKD"><label for="phenotype_pkd">PKD (Paroxysmal Kinesigenic Dyskinesia)</label></div>
-          <div class="checkbox-option"><input id="phenotype_ped" name="00Nfn00000JmgZt" type="checkbox" value="PED"><label for="phenotype_ped">PED (Paroxysmal Exertional Dyskinesia)</label></div>
-          <div class="checkbox-option"><input id="phenotype_hm" name="00Nfn00000JmgZt" type="checkbox" value="HM"><label for="phenotype_hm">Hemiplegic Migraine</label></div>
-          <div class="checkbox-option"><input id="phenotype_dysphonia" name="00Nfn00000JmgZt" type="checkbox" value="Persistent Dysphonia"><label for="phenotype_dysphonia">Persistent Dysphonia</label></div>
-          <div class="checkbox-option"><input id="phenotype_cervical_dystonia" name="00Nfn00000JmgZt" type="checkbox" value="Cervical Dystonia"><label for="phenotype_cervical_dystonia">Cervical Dystonia</label></div>
-          <div class="checkbox-option"><input id="phenotype_generalized_dystonia" name="00Nfn00000JmgZt" type="checkbox" value="Generalized Dystonia"><label for="phenotype_generalized_dystonia">Generalized Dystonia</label></div>
-          <div class="checkbox-option"><input id="phenotype_tics" name="00Nfn00000JmgZt" type="checkbox" value="Tics"><label for="phenotype_tics">Tics</label></div>
-          <div class="checkbox-option"><input id="phenotype_other" name="00Nfn00000JmgZt" type="checkbox" value="Other"><label for="phenotype_other">Other</label></div>
-        </div>
+<div class="field">
+<label for="sex">Sex <span class="optional">(of the person with PRRT2, optional)</span></label>
+<select id="sex" name="00NbV000003nR3l">
+<option value="">--None--</option>
+<option value="Female">Female</option>
+<option value="Male">Male</option>
+<option value="Intersex">Intersex</option>
+<option value="Prefer not to say">Prefer not to say</option>
+</select>
+</div>
 
-        <div class="field">
-          <label for="first_symptom">Which Symptom Appeared First?</label>
-          <select id="first_symptom" name="00Nfn00000JxaDt">
-            <option value="">--None--</option>
-            <option value="BFIE">BFIE</option>
-            <option value="Epilepsy">Epilepsy</option>
-            <option value="PKD">PKD</option>
-            <option value="PED">PED</option>
-            <option value="Hemiplegic Migraine">Hemiplegic Migraine</option>
-            <option value="Persistent Dysphonia">Persistent Dysphonia</option>
-            <option value="Cervical Dystonia">Cervical Dystonia</option>
-            <option value="Generalized Dystonia">Generalized Dystonia</option>
-            <option value="Tics">Tics</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
+<hr class="section-divider">
+<fieldset>
+<legend>A Few Quick Questions <span class="optional" style="font-weight:300; font-size:13px;">(all optional)</span></legend>
 
-        <div class="field">
-          <label for="first_symptom_stage">Developmental Stage at First Symptom</label>
-          <select id="first_symptom_stage" name="00Nfn00000Jxa33">
-            <option value="">--None--</option>
-            <option value="Before age 1">Before age 1</option>
-            <option value="Age 1-5">Age 1-5</option>
-            <option value="Age 6-12">Age 6-12</option>
-            <option value="Puberty/teens">Puberty/teens</option>
-            <option value="Adulthood">Adulthood</option>
-            <option value="Unknown">Unknown</option>
-          </select>
-        </div>
+<div class="checkbox-group">
+<div class="checkbox-group-label">Phenotypes <span class="optional">(select all that apply)</span></div>
+<div class="checkbox-option"><input id="phenotype_bfie" name="00Nfn00000JmgZt" type="checkbox" value="BFIE"><label for="phenotype_bfie">BFIE (Benign Familial Infantile Epilepsy)</label></div>
+<div class="checkbox-option"><input id="phenotype_epilepsy" name="00Nfn00000JmgZt" type="checkbox" value="Epilepsy"><label for="phenotype_epilepsy">Epilepsy (non-infantile onset)</label></div>
+<div class="checkbox-option"><input id="phenotype_pkd" name="00Nfn00000JmgZt" type="checkbox" value="PKD"><label for="phenotype_pkd">PKD (Paroxysmal Kinesigenic Dyskinesia)</label></div>
+<div class="checkbox-option"><input id="phenotype_ped" name="00Nfn00000JmgZt" type="checkbox" value="PED"><label for="phenotype_ped">PED (Paroxysmal Exertional Dyskinesia)</label></div>
+<div class="checkbox-option"><input id="phenotype_hm" name="00Nfn00000JmgZt" type="checkbox" value="HM"><label for="phenotype_hm">Hemiplegic Migraine</label></div>
+<div class="checkbox-option"><input id="phenotype_dysphonia" name="00Nfn00000JmgZt" type="checkbox" value="Persistent Dysphonia"><label for="phenotype_dysphonia">Persistent Dysphonia</label></div>
+<div class="checkbox-option"><input id="phenotype_cervical_dystonia" name="00Nfn00000JmgZt" type="checkbox" value="Cervical Dystonia"><label for="phenotype_cervical_dystonia">Cervical Dystonia</label></div>
+<div class="checkbox-option"><input id="phenotype_generalized_dystonia" name="00Nfn00000JmgZt" type="checkbox" value="Generalized Dystonia"><label for="phenotype_generalized_dystonia">Generalized Dystonia</label></div>
+<div class="checkbox-option"><input id="phenotype_tics" name="00Nfn00000JmgZt" type="checkbox" value="Tics"><label for="phenotype_tics">Tics</label></div>
+<div class="checkbox-option"><input id="phenotype_other" name="00Nfn00000JmgZt" type="checkbox" value="Other"><label for="phenotype_other">Other</label></div>
+</div>
 
-        <div class="field">
-          <label for="symptoms_first_year">Were Any Symptoms Present in the First Year of Life?</label>
-          <select id="symptoms_first_year" name="00Nfn00000JxbqD">
-            <option value="">--None--</option>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-            <option value="Unsure">Unsure</option>
-          </select>
-        </div>
+<div class="field">
+<label for="prrt2_variant">PRRT2 Variant <span class="optional">(if known)</span></label>
+<select id="prrt2_variant" name="00Nfn00000JmPlx">
+<option value="">--None--</option>
+<option value="c.649dupC">c.649dupC — the most common PRRT2 variant</option>
+<option value="Other">A different PRRT2 variant</option>
+<option value="Unknown">I don't know / not sure</option>
+</select>
+</div>
 
-        <div class="field">
-          <label for="continuous_6mo">Have You Ever Had a Symptom Continuously for More Than 6 Months Without a Symptom-Free Period?</label>
-          <select id="continuous_6mo" name="00Nfn00000Jxbrp">
-            <option value="">--None--</option>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-          </select>
-        </div>
+<div class="field">
+<label for="first_symptom">Which Symptom Appeared First?</label>
+<select id="first_symptom" name="00Nfn00000JxaDt">
+<option value="">--None--</option>
+<option value="BFIE">BFIE</option>
+<option value="Epilepsy">Epilepsy</option>
+<option value="PKD">PKD</option>
+<option value="PED">PED</option>
+<option value="Hemiplegic Migraine">Hemiplegic Migraine</option>
+<option value="Persistent Dysphonia">Persistent Dysphonia</option>
+<option value="Cervical Dystonia">Cervical Dystonia</option>
+<option value="Generalized Dystonia">Generalized Dystonia</option>
+<option value="Tics">Tics</option>
+<option value="Other">Other</option>
+</select>
+</div>
 
-        <div class="field">
-          <label for="told_would_resolve">Have You Ever Been Told Your Symptoms Would Resolve or You Would Outgrow Them?</label>
-          <select id="told_would_resolve" name="00Nfn00000JxbtR">
-            <option value="">--None--</option>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-          </select>
-        </div>
+<div class="field">
+<label for="first_symptom_stage">Developmental Stage at First Symptom</label>
+<select id="first_symptom_stage" name="00Nfn00000Jxa33">
+<option value="">--None--</option>
+<option value="Before age 1">Before age 1</option>
+<option value="Age 1-5">Age 1-5</option>
+<option value="Age 6-12">Age 6-12</option>
+<option value="Puberty/teens">Puberty/teens</option>
+<option value="Adulthood">Adulthood</option>
+<option value="Unknown">Unknown</option>
+</select>
+</div>
 
-        <div class="field">
-          <label for="years_to_diagnosis">How Many Years Between First Symptom and PRRT2 Diagnosis?</label>
-          <select id="years_to_diagnosis" name="00Nfn00000Jxbwf">
-            <option value="">--None--</option>
-            <option value="Less than 1">Less than 1</option>
-            <option value="1-5">1-5</option>
-            <option value="5-10">5-10</option>
-            <option value="10-20">10-20</option>
-            <option value="20+">20+</option>
-            <option value="Still unconfirmed">Still unconfirmed</option>
-          </select>
-        </div>
+<div class="field">
+<label for="symptoms_first_year">Were Any Symptoms Present in the First Year of Life?</label>
+<select id="symptoms_first_year" name="00Nfn00000JxbqD">
+<option value="">--None--</option>
+<option value="Yes">Yes</option>
+<option value="No">No</option>
+<option value="Unsure">Unsure</option>
+</select>
+</div>
 
-        <div class="field">
-          <label for="testing_trigger">What Led to PRRT2 Testing?</label>
-          <select id="testing_trigger" name="00Nfn00000JxbyH">
-            <option value="">--None--</option>
-            <option value="Doctor suggested it">Doctor suggested it</option>
-            <option value="Family member diagnosed first">Family member diagnosed first</option>
-            <option value="Self-advocacy/research">Self-advocacy and research</option>
-            <option value="Part of broad genetic panel">Part of a broad genetic panel</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
+<div class="field">
+<label for="continuous_6mo">Have You Ever Had a Symptom Continuously for More Than 6 Months Without a Symptom-Free Period?</label>
+<select id="continuous_6mo" name="00Nfn00000Jxbrp">
+<option value="">--None--</option>
+<option value="Yes">Yes</option>
+<option value="No">No</option>
+</select>
+</div>
 
-        <div class="field">
-          <label for="testing_payment_source">Was Genetic Testing Covered by Insurance, a Sponsored/Free Testing Program, or Out-of-Pocket?</label>
-          <select id="testing_payment_source" name="00Nfn00000Jxbzt">
-            <option value="">--None--</option>
-            <option value="Insurance">Insurance</option>
-            <option value="Sponsored/free testing program">Sponsored/free testing program</option>
-            <option value="Out-of-pocket">Out-of-pocket</option>
-            <option value="Unknown">Unknown</option>
-          </select>
-        </div>
+<div class="field">
+<label for="told_would_resolve">Have You Ever Been Told Your Symptoms Would Resolve or You Would Outgrow Them?</label>
+<select id="told_would_resolve" name="00Nfn00000JxbtR">
+<option value="">--None--</option>
+<option value="Yes">Yes</option>
+<option value="No">No</option>
+</select>
+</div>
 
-        <div class="field">
-          <label for="research_contact_ok">Would You Be Willing to Be Contacted for Future Research Studies?</label>
-          <select id="research_contact_ok" name="00Nfn00000Jxc1V">
-            <option value="">--None--</option>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-            <option value="Maybe">Maybe</option>
-          </select>
-        </div>
-      </fieldset>
+<div class="field">
+<label for="years_to_diagnosis">How Many Years Between First Symptom and PRRT2 Diagnosis?</label>
+<select id="years_to_diagnosis" name="00Nfn00000Jxbwf">
+<option value="">--None--</option>
+<option value="Less than 1">Less than 1</option>
+<option value="1-5">1-5</option>
+<option value="5-10">5-10</option>
+<option value="10-20">10-20</option>
+<option value="20+">20+</option>
+<option value="Still unconfirmed">Still unconfirmed</option>
+</select>
+</div>
 
-      <hr class="section-divider">
+<div class="field">
+<label for="testing_trigger">What Led to PRRT2 Testing?</label>
+<select id="testing_trigger" name="00Nfn00000JxbyH">
+<option value="">--None--</option>
+<option value="Doctor suggested it">Doctor suggested it</option>
+<option value="Family member diagnosed first">Family member diagnosed first</option>
+<option value="Self-advocacy/research">Self-advocacy and research</option>
+<option value="Part of broad genetic panel">Part of a broad genetic panel</option>
+<option value="Other">Other</option>
+</select>
+</div>
 
-      <div class="field">
-        <label for="description">Tell us about your PRRT2 situation <span class="optional">(optional)</span></label>
-        <textarea id="description" name="description" maxlength="32000" placeholder="Diagnosis status, symptoms, or anything you'd like us to know."></textarea>
-      </div>
+<div class="field">
+<label for="testing_payment_source">Was Genetic Testing Covered by Insurance, a Sponsored/Free Testing Program, or Out-of-Pocket?</label>
+<select id="testing_payment_source" name="00Nfn00000Jxbzt">
+<option value="">--None--</option>
+<option value="Insurance">Insurance</option>
+<option value="Sponsored/free testing program">Sponsored/free testing program</option>
+<option value="Out-of-pocket">Out-of-pocket</option>
+<option value="Unknown">Unknown</option>
+</select>
+</div>
 
-      <button type="submit">Submit Registration</button>
-    </form>
-  </section>
+<div class="field">
+<label for="research_contact_ok">Would You Be Willing to Be Contacted for Future Research Studies?</label>
+<select id="research_contact_ok" name="00Nfn00000Jxc1V">
+<option value="">--None--</option>
+<option value="Yes">Yes</option>
+<option value="No">No</option>
+<option value="Maybe">Maybe</option>
+</select>
+</div>
+</fieldset>
 
-  <div class="notices">
-    <div class="notice notice-info">
-      <strong>Your privacy matters.</strong> Information submitted here is used internally by PRRT2 Foundation to coordinate patient outreach and is never sold or shared. See our <a href="https://www.prrt2.org/resources/privacy-policy" style="color:#143A55;">Privacy Policy</a> for details.
-    </div>
-  </div>
+<hr class="section-divider">
+
+<div class="field">
+<label for="description">Tell us about your PRRT2 situation <span class="optional">(optional)</span></label>
+<textarea id="description" name="description" maxlength="32000" placeholder="Diagnosis status, symptoms, or anything you'd like us to know."></textarea>
+</div>
+
+<div class="consent-field">
+<input type="checkbox" id="email_consent" name="00NbV000003nR8b" value="1">
+<label for="email_consent">Yes, keep me informed by email about PRRT2 Foundation news, research, and when the patient registry opens. You can unsubscribe any time.</label>
+</div>
+
+<button type="submit">Submit Registration</button>
+</form>
+</section>
+
+<div class="notices">
+<div class="notice notice-info">
+<strong>Your privacy matters.</strong> Information submitted here is used internally by PRRT2 Foundation to coordinate patient outreach and is never sold or shared. See our <a href="https://www.prrt2.org/resources/privacy-policy" style="color:#143A55;">Privacy Policy</a> for details.
+</div>
+</div>
 
 </div>
 
 <footer>
-  <p>PRRT2 Foundation, Inc. &nbsp;·&nbsp; North Port, Florida<br>
-  <a href="https://www.prrt2.org">prrt2.org</a> &nbsp;·&nbsp; <a href="mailto:contact@prrt2.org">contact@prrt2.org</a></p>
-  <p class="ein">EIN: 42-3128330</p>
+<p>PRRT2 Foundation, Inc. &nbsp;·&nbsp; North Port, Florida<br>
+<a href="https://www.prrt2.org">prrt2.org</a> &nbsp;·&nbsp; <a href="mailto:contact@prrt2.org">contact@prrt2.org</a></p>
+<p class="ein">EIN: 42-3128330</p>
 </footer>
 
 <script>
-  (function () {
-    var form = document.getElementById('intake-form');
-    var checkbox = document.getElementById('confirmed_testing');
-    var notice = document.getElementById('not-eligible-notice');
-    if (!form || !checkbox || !notice) return;
+(function () {
+var form = document.getElementById('intake-form');
+var checkbox = document.getElementById('confirmed_testing');
+var notice = document.getElementById('not-eligible-notice');
+if (!form || !checkbox || !notice) return;
 
-    form.addEventListener('submit', function (e) {
-      if (!checkbox.checked) {
-        e.preventDefault();
-        notice.style.display = 'block';
-        checkbox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    });
+form.addEventListener('submit', function (e) {
+if (!checkbox.checked) {
+e.preventDefault();
+notice.style.display = 'block';
+checkbox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+});
 
-    checkbox.addEventListener('change', function () {
-      if (checkbox.checked) notice.style.display = 'none';
-    });
-  })();
+checkbox.addEventListener('change', function () {
+if (checkbox.checked) notice.style.display = 'none';
+});
+})();
 </script>
 
 </body>
