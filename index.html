@@ -157,9 +157,9 @@ This registry is currently limited to people with a confirmed PRRT2 genetic test
 <hr class="section-divider">
 
 <div class="field">
-<label for="registering_as">I'm registering <span class="optional">(who this profile is for)</span></label>
-<select id="registering_as" name="00NbV000003nR5N">
-<option value="">--None--</option>
+<label for="registering_as">I'm registering <span class="optional">(who this profile is for)</span> <span style="color:#C97A3F;">*</span></label>
+<select id="registering_as" name="00NbV000003nR5N" required>
+<option value="">--Select one--</option>
 <option value="Myself">Myself</option>
 <option value="Parent or guardian">As a parent or guardian</option>
 <option value="Other family member or caregiver">As another family member or caregiver</option>
@@ -397,14 +397,14 @@ This registry is currently limited to people with a confirmed PRRT2 genetic test
 </select>
 </div>
 <div class="field">
-<label for="year_of_birth">Year of Birth <span class="optional">(of the person with PRRT2, optional)</span></label>
-<input id="year_of_birth" name="00NbV000003nR0X" type="number" min="1900" max="2026" placeholder="e.g. 1998">
+<label for="year_of_birth">Year of Birth <span class="optional">(of the person with PRRT2)</span> <span style="color:#C97A3F;">*</span></label>
+<input id="year_of_birth" name="00NbV000003nR0X" type="number" min="1900" max="2026" placeholder="e.g. 1998" required>
 </div>
 </div>
 
 <div class="field">
-<label for="sex">Sex <span class="optional">(of the person with PRRT2, optional)</span></label>
-<select id="sex" name="00NbV000003nR3l">
+<label for="sex">Sex assigned at birth <span class="optional">(of the person with PRRT2)</span> <span style="color:#C97A3F;">*</span></label>
+<select id="sex" name="00NbV000003nR3l" required>
 <option value="">--None--</option>
 <option value="Female">Female</option>
 <option value="Male">Male</option>
@@ -415,7 +415,7 @@ This registry is currently limited to people with a confirmed PRRT2 genetic test
 
 <hr class="section-divider">
 <fieldset>
-<legend>A Few Quick Questions <span class="optional" style="font-weight:300; font-size:13px;">(all optional)</span></legend>
+<legend>A Few Quick Questions <span class="optional" style="font-weight:300; font-size:13px;">(answer what you can)</span></legend>
 
 <div class="checkbox-group">
 <div class="checkbox-group-label">Phenotypes <span class="optional">(select all that apply)</span></div>
@@ -439,6 +439,11 @@ This registry is currently limited to people with a confirmed PRRT2 genetic test
 <option value="Other">A different PRRT2 variant</option>
 <option value="Unknown">I don't know / not sure</option>
 </select>
+</div>
+
+<div class="field">
+<label for="prrt2_variant_detail">If it's a different variant, type it here <span class="optional">(if known)</span></label>
+<input id="prrt2_variant_detail" name="00NbV000003nRVB" type="text" maxlength="255" placeholder="e.g. c.649delC, p.Arg217Profs*8, or your lab report's notation">
 </div>
 
 <div class="field">
