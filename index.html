@@ -1,11 +1,18 @@
 <!--
 PRRT2 Foundation — Step 1 Patient Intake
 =========================================================================
+UPDATED (7/21/2026): Removed the "Email Updates Consent" checkbox
+  (formerly name=00NbV000003nR8b). Newsletter/marketing sign-up is now
+  handled entirely outside this form (Givebutter), so this form no
+  longer implies a newsletter opt-in. Replaced with a plain disclosure
+  line above the submit button scoping contact to registry/membership
+  only. The Salesforce field 00NbV000003nR8b still exists on Lead but
+  is no longer populated by this form — safe to leave or retire later.
+
 UPDATED (7/20/2026): Added 4 new fields + country dropdown + variant dropdown.
   - Registering As           picklist  name=00NbV000003nR5N
   - Year of Birth            number    name=00NbV000003nR0X
   - Sex                      picklist  name=00NbV000003nR3l
-  - Email Updates Consent    checkbox  name=00NbV000003nR8b
   - PRRT2 Variant (reused)   text      name=00Nfn00000JmPlx  (fed by dropdown)
   - Country changed from free-text to a fixed dropdown (name=country) for clean stats.
 Eligibility gate (Confirmed_by_Testing__c, 00Nfn00000JmP9F) retained.
@@ -85,6 +92,7 @@ transition:border-color 0.15s ease;
 .consent-field { display:flex; flex-direction:row; align-items:flex-start; gap:10px; background:rgba(136,155,130,0.08); border-left:3px solid #889B82; padding:14px 16px; border-radius:5px; }
 .consent-field input[type="checkbox"] { width:18px; height:18px; margin-top:2px; accent-color:#C97A3F; flex-shrink:0; }
 .consent-field label { font-weight:400; font-size:14px; color:#1E1B17; line-height:1.5; }
+.consent-notice { font-weight:300; font-size:13px; color:#555; line-height:1.55; margin-top:-2px; }
 
 button[type="submit"] {
 font-family:'IBM Plex Mono',monospace;
@@ -629,10 +637,7 @@ Membership is currently limited to people with a confirmed PRRT2 genetic test re
 <textarea id="description" name="description" maxlength="32000" placeholder="Diagnosis status, symptoms, or anything you'd like us to know."></textarea>
 </div>
 
-<div class="consent-field">
-<input type="checkbox" id="email_consent" name="00NbV000003nR8b" value="1">
-<label for="email_consent">Yes, keep me informed by email about PRRT2 Foundation news, research, and upcoming studies and partnerships as they open. You can unsubscribe any time.</label>
-</div>
+<p class="consent-notice">By submitting, you may be contacted by PRRT2 Foundation regarding your registry submission and Foundation membership.</p>
 
 <button type="submit">Submit Registration</button>
 </form>
